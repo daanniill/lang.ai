@@ -28,3 +28,58 @@ class Transcript:
     student_id: int
     session_id: int
     transcript: str
+
+class LanguageLearningDB:
+    def __init__(self, db_url: str):
+        # initialize db with connection url
+        self.db_url = db_url
+        self._init_db()
+
+    @contextmanager
+    def _get_connection(self):
+        # context manager for postgresql connection
+        conn = psycopg2.connect(self.db_url, cursor_factory=RealDictCursor)
+        try:
+            yield conn
+        finally:
+            conn.close()
+    
+    def _init_db(self):
+        with self._get_connection() as conn:
+            # Drop existing tables to ensure a clean reset 
+            cursor = conn.cursor()
+
+            cursor.execute("DROP TABLE IF EXISTS Transcripts CASCADE;")
+            cursor.execute("DROP TABLE IF EXISTS Sessions CASCADE;")
+            cursor.execute("DROP TABLE IF EXISTS Students CASCADE;")
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Students (
+                    student_id serial PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    email VARCHAR(255) UNIQUE,
+                    phone_number VARCHAR(16) UNIQUE,
+                    skill_level TEXT,
+                    strengths TEXT,
+                    weaknesses TEXT
+                );
+            """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Sessions (
+                    session_id serial PRIMARY KEY,
+                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
+                    session_summary TEXT,
+                    session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Transcripts (
+                    transcript_id serial PRIMARY KEY,
+                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
+                    session_id INT REFERENCES Sessions(session_id) ON DELETE CASCADE,
+                    transcript TEXT
+                );
+            """)
+            conn.commit()
