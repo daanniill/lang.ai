@@ -83,3 +83,24 @@ class LanguageLearningDB:
                 );
             """)
             conn.commit()
+
+    def add_student(self, name: str, email: str, phone_number: str,
+                    skill_level: Optional[str], strengths: Optional[str], weaknesses: Optional[str]) -> Student:
+        # Add a new student to the database
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO Students (name, email, phone_number, skill_level, strengths, weaknesses)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING *;
+            """, (name, email, phone_number, skill_level, strengths, weaknesses))
+            conn.commit()
+            return Student(**cursor.fetchone())
+        
+    def get_student_by_id(self, student_id: int) -> Optional[Student]:
+        # Retrieve a student by ID
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Students WHERE student_id = %s;", (student_id,))
+            row = cursor.fetchone()
+            return Student(**row) if row else None
