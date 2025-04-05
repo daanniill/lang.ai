@@ -48,5 +48,5 @@ INSTRUCTIONS = """
 """
 
 WELCOME_MESSAGE = """
-    Begin by greeting the user and asking them for their student id. If it is their first time and they don't have a student_id, ask them to say create a profile.
+    Begin by greeting the user and asking them about their language learning goals. Adapt dynamically to their responses and guide them toward better fluency in an interactive and engaging way."
 """
