@@ -11,6 +11,7 @@ from livekit.agents import (
 from livekit.agents.multimodal import MultimodalAgent
 from livekit.plugins import openai
 from dotenv import load_dotenv
+from api import TutorFnc
 from prompts import INSTRUCTIONS, WELCOME_MESSAGE
 import os
 
@@ -18,7 +19,8 @@ import os
 load_dotenv()
 
 # connects to a livekit room and subsribes to all the tracks in that room
-# aka in our case hears all audio in that room
+# aka in our case hears all a
+# audio in that room
 async def entrypoint(ctx: JobContext):
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
     await ctx.wait_for_participant() # waits for a participant to join a room
@@ -30,5 +32,20 @@ async def entrypoint(ctx: JobContext):
         temperature=0.8,
         modalities=["audio", "text"]
     )
+    tutor_fnc = TutorFnc()
+    # initializing the multimodal agent class with the defined model and functions from the api
+    tutor = MultimodalAgent(model=model, fnc_ctx=tutor_fnc)
+    tutor.start(ctx.room) # starting the agent
 
-    
+    # passing in the welcome message
+    session = model.sessions[0]
+    session.conversation.item.create(
+        llm.ChatMessage(
+            role="tutor",
+            content=WELCOME_MESSAGE
+        )
+    )
+    session.response.create()
+
+if __name__ == "__main__":
+    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
