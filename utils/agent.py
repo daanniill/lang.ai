@@ -11,6 +11,7 @@ from livekit.agents import (
 from livekit.agents.multimodal import MultimodalAgent
 from livekit.plugins import openai
 from dotenv import load_dotenv
+from prompts import INSTRUCTIONS, WELCOME_MESSAGE
 import os
 
 # loading environment vars
@@ -21,3 +22,13 @@ load_dotenv()
 async def entrypoint(ctx: JobContext):
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
     await ctx.wait_for_participant() # waits for a participant to join a room
+
+    #defining model
+    model = openai.realtime.RealtimeModel(
+        instructions=INSTRUCTIONS,
+        voice="shimmer",
+        temperature=0.8,
+        modalities=["audio", "text"]
+    )
+
+    
