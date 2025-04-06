@@ -40,7 +40,7 @@ class TutorFnc(llm.FunctionContext):
         
         return student_str
     
-    @llm.ai_callable(description="get details on studeb by their ID")
+    @llm.ai_callable(description="get details on student by their ID")
     def get_student_details(self, student_id: Annotated[str, llm.TypeInfo(description="The student id of the student to lookup")]):
         logger.info("lookup student - student_id: %s", student_id)
 
@@ -85,4 +85,21 @@ class TutorFnc(llm.FunctionContext):
         }
 
         return "Student Added!"
+    
+    @llm.ai_callable(description="Save the current session")
+    def addSession(
+        self, 
+        student_id: Annotated[int, llm.TypeInfo(description="The student id of the student")],
+        session_sumarry: Annotated[int, llm.TypeInfo(description="A summery of how the session went")],
+        transcript: Annotated[int, llm.TypeInfo(description="A transcript of the session")]
+    ):
+        logger.info("saving session:")
 
+        datab = db.create_session(student_id, session_sumarry, transcript)
+
+        if datab is None:
+            return "Could not save the session"
+        
+        return "Session Saved!"
+
+    

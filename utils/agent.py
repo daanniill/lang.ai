@@ -1,5 +1,6 @@
 # defining agent
 from __future__ import annotations
+from livekit import rtc
 from livekit.agents import (
     AutoSubscribe,
     JobContext,
@@ -48,6 +49,10 @@ async def entrypoint(ctx: JobContext):
         )
     )
     session.response.create()
+
+    @ctx.room.on("participant_disconnected")
+    def on_participant_disconnected(participant: rtc.RemoteParticipant):
+        
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
