@@ -19,7 +19,7 @@ import os
 # loading environment vars
 load_dotenv()
 
-student_id = 12345
+student_id = 1
 
 # connects to a livekit room and subsribes to all the tracks in that room
 # aka in our case hears all a
