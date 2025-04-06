@@ -34,7 +34,6 @@ class LanguageLearningDB:
     def __init__(self, db_url: str):
         # initialize db with connection url
         self.db_url = db_url
-        self._init_db()
 
     @contextmanager
     def _get_connection(self):

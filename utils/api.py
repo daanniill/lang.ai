@@ -40,7 +40,7 @@ class TutorFnc(llm.FunctionContext):
         
         return student_str
     
-    @llm.ai_callable(description="get details on current student")
+    @llm.ai_callable(description="get details on studeb by their ID")
     def get_student_details(self, student_id: Annotated[str, llm.TypeInfo(description="The student id of the student to lookup")]):
         logger.info("lookup student - student_id: %s", student_id)
 
@@ -51,7 +51,7 @@ class TutorFnc(llm.FunctionContext):
         self._student_details = {
             StudentDeatils.Student_id: result.student_id,
             StudentDeatils.Name: result.name,
-            StudentDeatils.Language: result.language,
+            StudentDeatils.Language: result.language_used,
             StudentDeatils.Skill_Level: result.skill_level,
             StudentDeatils.Strengths: result.strengths,
             StudentDeatils.Weaknesses: result.weaknesses,
@@ -65,20 +65,20 @@ class TutorFnc(llm.FunctionContext):
         name: Annotated[str, llm.TypeInfo(description="The name of the student")],
         email: Annotated[str, llm.TypeInfo(description="The email of the student")],
         phone_number: Annotated[str, llm.TypeInfo(description="The email of the student")],
-        language: Annotated[str, llm.TypeInfo(description="The language of the student")],
         skill_level: Annotated[str, llm.TypeInfo(description="The skill level of the student")],
         strengths: Annotated[str, llm.TypeInfo(description="The strengths of the student")],
         weaknesses: Annotated[str, llm.TypeInfo(description="The weaknesses of the student")],
+        language_used: Annotated[str, llm.TypeInfo(description="The language of the student")]
     ):
-        logger.info("add student - student id: %s, name: %s, email: %s, phone_number: %s, language: %s, skill level: %s, strengths: %s, weaknesses: %s", student_id, name, email, phone_number, language, skill_level, strengths, weaknesses)
-        result = db.add_student(student_id, name, email, phone_number, language, skill_level, strengths, weaknesses)
+        logger.info("add student - student id: %s, name: %s, email: %s, phone_number: %s, language: %s, skill level: %s, strengths: %s, weaknesses: %s", student_id, name, email, phone_number, language_used, skill_level, strengths, weaknesses)
+        result = db.add_student(student_id, name, email, phone_number, skill_level, strengths, weaknesses, language_used)
         if result is None:
             return "Failed to add student"
         
         self._student_details = {
             StudentDeatils.Student_id: result.student_id,
             StudentDeatils.Name: result.name,
-            StudentDeatils.Language: result.language,
+            StudentDeatils.Language: result.language_used,
             StudentDeatils.Skill_Level: result.skill_level,
             StudentDeatils.Strengths: result.strengths,
             StudentDeatils.Weaknesses: result.weaknesses,

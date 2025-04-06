@@ -25,14 +25,16 @@ async def entrypoint(ctx: JobContext):
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
     await ctx.wait_for_participant() # waits for a participant to join a room
 
+    tutor_fnc = TutorFnc()
+    det = tutor_fnc.get_student_details(12345)
+
     #defining model
     model = openai.realtime.RealtimeModel(
-        instructions=INSTRUCTIONS,
+        instructions=INSTRUCTIONS(det),
         voice="shimmer",
         temperature=0.8,
         modalities=["audio", "text"]
     )
-    tutor_fnc = TutorFnc()
     # initializing the multimodal agent class with the defined model and functions from the api
     tutor = MultimodalAgent(model=model, fnc_ctx=tutor_fnc)
     tutor.start(ctx.room) # starting the agent
