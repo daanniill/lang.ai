@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
     
-
     const [error, setError] = useState('')
     const router = useRouter();
     const client_id = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID

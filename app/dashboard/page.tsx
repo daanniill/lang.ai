@@ -90,7 +90,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen w-screen bg-slate-950 text-white">
       <aside className="hidden md:flex w-64 flex-col bg-slate-900 p-6 border-r border-slate-800">
-        <h2 className="text-xl font-bold mb-6">PolyglotAI</h2>
+        <h2 className="text-xl font-bold mb-6 pl-2">Lang AI</h2>
         <nav className="flex flex-col space-y-4 text-sm text-slate-400">
           <span className="hover:text-white cursor-pointer">🗣️ New Conversation</span>
           <span className="hover:text-white cursor-pointer">📈 Progress Report</span>
@@ -105,7 +105,7 @@ export default function Dashboard() {
           </button>
         </div>
       </aside>
-      <main>
+      <main className="flex w-full h-full place-items-center">
         <LiveKitModal/>
         {showSkillModal && (
           <SkillModal

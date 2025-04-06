@@ -33,14 +33,14 @@ const LiveKitModal = ({}) =>{
     }
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
+        <div className="flex w-full h-full place-self-center">
+            <div className="flex w-full h-full justify-center align-center">
                 {isSubmittingName ? (
-                   <form onSubmit={handleNameSubmit} className="name-form">
+                   <form onSubmit={handleNameSubmit} className="place-self-center bg-cyan-600 p-3 rounded-lg">
                         <button onClick={() => {setName("participant")}} type="submit">Begin Session</button>
                    </form> 
                 ) : token ? (
-                    <LiveKitRoom
+                    <LiveKitRoom className="w-full h-full"
                         serverUrl={livekitApi}
                         token={token}
                         connect={true}
