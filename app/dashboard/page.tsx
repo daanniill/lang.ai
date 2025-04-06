@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import LiveKitModal from "../../components/LiveKitModal.jsx"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -35,6 +36,9 @@ export default function Dashboard() {
           </button>
         </div>
       </aside>
+      <main>
+        <LiveKitModal/>
+      </main>
     </div>
   )
 }

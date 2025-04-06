@@ -34,7 +34,7 @@ const LiveKitModal = ({}) =>{
             <div className="modal-content">
                 {setIsSubmittingName ? (
                    <form onSubmit={handleNameSubmit} className="name-form">
-                         <button type="submit">Begin Session</button>
+                        <button type="submit">Begin Session</button>
                    </form> 
                 ) : token ? (
                     <LiveKitRoom
