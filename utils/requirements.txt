@@ -7,4 +7,5 @@ livekit-api
 flask[async]
 flask
 flask-cors
+psycopg2
 uvicorn
