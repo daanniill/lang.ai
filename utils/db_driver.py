@@ -14,6 +14,7 @@ class Student:
     skill_level: Optional[str]
     strengths: Optional[str]
     weaknesses: Optional[str]
+    language_used: str
 
 @dataclass
 class Session:
@@ -42,63 +43,22 @@ class LanguageLearningDB:
         try:
             yield conn
         finally:
-            conn.close()
-    
-    def _init_db(self):
-        with self._get_connection() as conn:
-            # Drop existing tables to ensure a clean reset 
-            cursor = conn.cursor()
-
-            cursor.execute("DROP TABLE IF EXISTS Transcripts CASCADE;")
-            cursor.execute("DROP TABLE IF EXISTS Sessions CASCADE;")
-            cursor.execute("DROP TABLE IF EXISTS Students CASCADE;")
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Students (
-                    student_id serial PRIMARY KEY,
-                    name VARCHAR(255) NOT NULL,
-                    email VARCHAR(255) UNIQUE,
-                    phone_number VARCHAR(16) UNIQUE,
-                    skill_level TEXT,
-                    strengths TEXT,
-                    weaknesses TEXT
-                );
-            """)
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Sessions (
-                    session_id serial PRIMARY KEY,
-                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
-                    session_summary TEXT,
-                    session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Transcripts (
-                    transcript_id serial PRIMARY KEY,
-                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
-                    session_id INT REFERENCES Sessions(session_id) ON DELETE CASCADE,
-                    transcript TEXT
-                );
-            """)
-            conn.commit()
+            conn.close()        
 
     def add_student(self, name: str, email: str, phone_number: str,
-                    skill_level: Optional[str], strengths: Optional[str], weaknesses: Optional[str]) -> Student:
-        # Add a new student to the database
+                    skill_level: Optional[str], strengths: Optional[str],
+                    weaknesses: Optional[str], language_used: str) -> Student:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO Students (name, email, phone_number, skill_level, strengths, weaknesses)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO Students (name, email, phone_number, skill_level, strengths, weaknesses, language_used)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING *;
-            """, (name, email, phone_number, skill_level, strengths, weaknesses))
+            """, (name, email, phone_number, skill_level, strengths, weaknesses, language_used))
             conn.commit()
             return Student(**cursor.fetchone())
         
     def get_student_by_id(self, student_id: int) -> Optional[Student]:
-        # Retrieve a student by ID
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM Students WHERE student_id = %s;", (student_id,))
