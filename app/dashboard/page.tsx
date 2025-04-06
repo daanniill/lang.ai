@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import LiveKitModal from "../../components/LiveKitModal.jsx"
+import SkillModal from '../../components/SkillsModal.tsx';
 
 export default function Dashboard() {
   const router = useRouter()
@@ -10,6 +11,10 @@ export default function Dashboard() {
   const [messages, setMessages] = useState([
     { sender: 'ai', text: 'Hi! Ready to practice a conversation in your target language?' },
   ])
+  const [showSkillModal, setShowSkillModal]= useState(false);
+  const [skillLevel, setSkillLevel] = useState('');
+  const [strengths, setStrengths] = useState('');
+  const [weaknesses, setWeaknesses] = useState('');
 
   const sendMessage = () => {
     if (!message.trim()) return
@@ -17,6 +22,69 @@ export default function Dashboard() {
     setMessages(newMessages)
     setMessage('')
   }
+
+  const getUserPreferences = async () => {
+    const userEmail = sessionStorage.getItem('userEmail');
+
+    if (userEmail) {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {'Content-type': 'application/json'},
+        body: JSON.stringify({email: userEmail})
+      })
+
+      if (response.ok) {
+        const data = await response.json();
+
+        const {email, language_used, name, skill_level, strengths, weaknesses, student_id} = data;
+
+        if (!skill_level || !strengths || !weaknesses) {
+          setSkillLevel(skillLevel)
+          setStrengths(strengths || '')
+          setWeaknesses(weaknesses || '');
+          setShowSkillModal(true);
+        }
+
+
+      } else {
+        console.error("I dont even know what else could it possibly be ")
+      }
+    } else {
+      console.error("no email in session storage, something went wrong big time")
+    }
+
+  }
+
+  const handleSkillSubmit = async (skillsData) => {
+    const userEmail = sessionStorage.getItem('userEmail');
+
+    if (userEmail) {
+      const response = await fetch('/api/users/updateSkills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userEmail,
+          skill_level: skillsData.skillLevel,
+          strengths: skillsData.strengths,
+          weaknesses: skillsData.weaknesses
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("skillls updated:", data);
+        setShowSkillModal(false);
+        // close modal and then render the rest of the ui for the chatting
+      } else {
+        console.error("Error updating skills");
+      }
+    }
+  };
+
+  useEffect(()=> {
+    getUserPreferences();
+
+  }, [])
 
   return (
     <div className="flex h-screen w-screen bg-slate-950 text-white">
@@ -38,6 +106,18 @@ export default function Dashboard() {
       </aside>
       <main>
         <LiveKitModal/>
+        {showSkillModal && (
+          <SkillModal
+            skillLevel={skillLevel}
+            strengths={strengths}
+            weaknesses={weaknesses}
+            setSkillLevel={setSkillLevel}
+            setStrengths={setStrengths}
+            setWeaknesses={setWeaknesses}
+            onClose={() => setShowSkillModal(false)}
+            onSubmit={handleSkillSubmit}
+          />
+        )}
       </main>
     </div>
   )
