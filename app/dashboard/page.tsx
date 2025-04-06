@@ -15,6 +15,10 @@ export default function Dashboard() {
   const [skillLevel, setSkillLevel] = useState('');
   const [strengths, setStrengths] = useState('');
   const [weaknesses, setWeaknesses] = useState('');
+<<<<<<< HEAD
+=======
+  const [userLanguage, setLanguage] = useState('');
+>>>>>>> bff18f7ef3f8beb623d0b4437470926f962f45a6
 
   const sendMessage = () => {
     if (!message.trim()) return
@@ -66,13 +70,21 @@ export default function Dashboard() {
           email: userEmail,
           skill_level: skillsData.skillLevel,
           strengths: skillsData.strengths,
+<<<<<<< HEAD
           weaknesses: skillsData.weaknesses
+=======
+          weaknesses: skillsData.weaknesses,
+          userLanguage: skillsData.userLanguage
+>>>>>>> bff18f7ef3f8beb623d0b4437470926f962f45a6
         })
       });
 
       if (response.ok) {
         const data = await response.json();
+<<<<<<< HEAD
         console.log("skillls updated:", data);
+=======
+>>>>>>> bff18f7ef3f8beb623d0b4437470926f962f45a6
         setShowSkillModal(false);
         // close modal and then render the rest of the ui for the chatting
       } else {
@@ -108,9 +120,17 @@ export default function Dashboard() {
         <LiveKitModal/>
         {showSkillModal && (
           <SkillModal
+<<<<<<< HEAD
             skillLevel={skillLevel}
             strengths={strengths}
             weaknesses={weaknesses}
+=======
+            userLanguage={userLanguage}
+            skillLevel={skillLevel}
+            strengths={strengths}
+            weaknesses={weaknesses}
+            setLanguage={setLanguage}
+>>>>>>> bff18f7ef3f8beb623d0b4437470926f962f45a6
             setSkillLevel={setSkillLevel}
             setStrengths={setStrengths}
             setWeaknesses={setWeaknesses}
