@@ -16,7 +16,7 @@ const SimpleChatBot = () => {
         <div className="control-section">
             <VoiceAssistantControlBar/>
             <div className="conversation">
-
+             
             </div>
         </div>
     </div>
