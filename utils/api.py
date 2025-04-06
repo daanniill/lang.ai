@@ -59,32 +59,21 @@ class TutorFnc(llm.FunctionContext):
 
         return f"The student details are: {self.get_student_str()}"
     
-    def add_student(
+    @llm.ai_callable(description="edit student's strengths and weaknesses")
+    def edit_student(
         self, 
         student_id: Annotated[int, llm.TypeInfo(description="The student id of the student")],
-        name: Annotated[str, llm.TypeInfo(description="The name of the student")],
-        email: Annotated[str, llm.TypeInfo(description="The email of the student")],
-        phone_number: Annotated[str, llm.TypeInfo(description="The email of the student")],
         skill_level: Annotated[str, llm.TypeInfo(description="The skill level of the student")],
         strengths: Annotated[str, llm.TypeInfo(description="The strengths of the student")],
         weaknesses: Annotated[str, llm.TypeInfo(description="The weaknesses of the student")],
-        language_used: Annotated[str, llm.TypeInfo(description="The language of the student")]
     ):
-        logger.info("add student - student id: %s, name: %s, email: %s, phone_number: %s, language: %s, skill level: %s, strengths: %s, weaknesses: %s", student_id, name, email, phone_number, language_used, skill_level, strengths, weaknesses)
-        result = db.add_student(student_id, name, email, phone_number, skill_level, strengths, weaknesses, language_used)
+        logger.info("edit student info - student id %s, skill level: %s, strengths: %s, weaknesses: %s", student_id, skill_level, strengths, weaknesses)
+        result = db.update_student_details(student_id, skill_level, strengths, weaknesses)
         if result is None:
-            return "Failed to add student"
+            return "Failed to edit student"
         
-        self._student_details = {
-            StudentDeatils.Student_id: result.student_id,
-            StudentDeatils.Name: result.name,
-            StudentDeatils.Language: result.language_used,
-            StudentDeatils.Skill_Level: result.skill_level,
-            StudentDeatils.Strengths: result.strengths,
-            StudentDeatils.Weaknesses: result.weaknesses,
-        }
+        return "Student info changed!"
 
-        return "Student Added!"
     
     @llm.ai_callable(description="Save the current session")
     def addSession(

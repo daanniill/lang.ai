@@ -83,3 +83,24 @@ class LanguageLearningDB:
             cursor.execute("SELECT * FROM Sessions WHERE student_id = %s ORDER BY session_date DESC;", (student_id,))
             rows = cursor.fetchall()
             return [Session(**row) for row in rows]
+
+    def update_student_details(self, student_id: int, skill_level: Optional[str], strengths: Optional[str], weaknesses: Optional[str]) -> Optional[Student]:
+        """Update the skill level, strengths, and weaknesses of a student."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Update skill level, strengths, and weaknesses for the given student_id
+            cursor.execute("""
+                UPDATE Students
+                SET skill_level = %s, strengths = %s, weaknesses = %s
+                WHERE student_id = %s
+                RETURNING *;
+            """, (skill_level, strengths, weaknesses, student_id))
+            
+            row = cursor.fetchone()
+            conn.commit()
+
+            if row:
+                return Student(**row)  # Return the updated student object
+            else:
+                return None  # Return None if no student is found with the given student_id

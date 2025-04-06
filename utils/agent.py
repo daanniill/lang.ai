@@ -19,6 +19,8 @@ import os
 # loading environment vars
 load_dotenv()
 
+student_id = 12345
+
 # connects to a livekit room and subsribes to all the tracks in that room
 # aka in our case hears all a
 # audio in that room
@@ -27,7 +29,7 @@ async def entrypoint(ctx: JobContext):
     await ctx.wait_for_participant() # waits for a participant to join a room
 
     tutor_fnc = TutorFnc()
-    det = tutor_fnc.get_student_details(12345)
+    det = tutor_fnc.get_student_details(student_id)
 
     #defining model
     model = openai.realtime.RealtimeModel(
