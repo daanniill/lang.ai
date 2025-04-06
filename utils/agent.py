@@ -9,12 +9,23 @@ from livekit.agents import (
     llm
 )
 
+import time
+import aiofiles
 from livekit.agents.multimodal import MultimodalAgent
 from livekit.plugins import openai
 from dotenv import load_dotenv
 from api import TutorFnc
+from helper import updateTranscript, getTranscript, getSumarry
 from prompts import INSTRUCTIONS, WELCOME_MESSAGE
 import os
+import asyncio
+import logging
+
+logger = logging.getLogger("user-data")
+logger.setLevel(logging.INFO)
+
+
+student_id = 12345
 
 # loading environment vars
 load_dotenv()
@@ -26,8 +37,9 @@ async def entrypoint(ctx: JobContext):
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
     await ctx.wait_for_participant() # waits for a participant to join a room
 
+    log_queue = asyncio.Queue()
     tutor_fnc = TutorFnc()
-    det = tutor_fnc.get_student_details(12345)
+    det = tutor_fnc.get_student_details(student_id)
 
     #defining model
     model = openai.realtime.RealtimeModel(
@@ -48,11 +60,15 @@ async def entrypoint(ctx: JobContext):
             content=WELCOME_MESSAGE
         )
     )
-    session.response.create()
+    session.response.create()    
 
     @ctx.room.on("participant_disconnected")
     def on_participant_disconnected(participant: rtc.RemoteParticipant):
-        
+        ret_string = ""
+        for block in log_queue:
+            ret_string += block + " "
+        tutor_fnc.addSession(student_id, "", ret_string)
+    
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))

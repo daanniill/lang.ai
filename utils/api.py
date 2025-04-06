@@ -102,4 +102,6 @@ class TutorFnc(llm.FunctionContext):
         
         return "Session Saved!"
 
+    def test():
+        logger.info("test")
     
