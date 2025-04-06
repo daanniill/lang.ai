@@ -3,6 +3,7 @@ from psycopg2.extras import RealDictCursor
 from dataclasses import dataclass
 from typing import Optional, List
 from contextlib import contextmanager
+import random
 from datetime import datetime
 
 @dataclass
@@ -14,6 +15,7 @@ class Student:
     skill_level: Optional[str]
     strengths: Optional[str]
     weaknesses: Optional[str]
+    language_used: str
 
 @dataclass
 class Session:
@@ -21,19 +23,12 @@ class Session:
     student_id: int
     session_summary: Optional[str]
     session_date: datetime
-
-@dataclass
-class Transcript:
-    transcript_id: int
-    student_id: int
-    session_id: int
     transcript: str
-
+    
 class LanguageLearningDB:
     def __init__(self, db_url: str):
         # initialize db with connection url
         self.db_url = db_url
-        self._init_db()
 
     @contextmanager
     def _get_connection(self):
@@ -42,65 +37,49 @@ class LanguageLearningDB:
         try:
             yield conn
         finally:
-            conn.close()
-    
-    def _init_db(self):
-        with self._get_connection() as conn:
-            # Drop existing tables to ensure a clean reset 
-            cursor = conn.cursor()
-
-            cursor.execute("DROP TABLE IF EXISTS Transcripts CASCADE;")
-            cursor.execute("DROP TABLE IF EXISTS Sessions CASCADE;")
-            cursor.execute("DROP TABLE IF EXISTS Students CASCADE;")
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Students (
-                    student_id serial PRIMARY KEY,
-                    name VARCHAR(255) NOT NULL,
-                    email VARCHAR(255) UNIQUE,
-                    phone_number VARCHAR(16) UNIQUE,
-                    skill_level TEXT,
-                    strengths TEXT,
-                    weaknesses TEXT
-                );
-            """)
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Sessions (
-                    session_id serial PRIMARY KEY,
-                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
-                    session_summary TEXT,
-                    session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Transcripts (
-                    transcript_id serial PRIMARY KEY,
-                    student_id INT REFERENCES Students(student_id) ON DELETE CASCADE,
-                    session_id INT REFERENCES Sessions(session_id) ON DELETE CASCADE,
-                    transcript TEXT
-                );
-            """)
-            conn.commit()
+            conn.close()        
 
     def add_student(self, name: str, email: str, phone_number: str,
-                    skill_level: Optional[str], strengths: Optional[str], weaknesses: Optional[str]) -> Student:
-        # Add a new student to the database
+                    skill_level: Optional[str], strengths: Optional[str],
+                    weaknesses: Optional[str], language_used: str) -> Student:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO Students (name, email, phone_number, skill_level, strengths, weaknesses)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO Students (name, email, phone_number, skill_level, strengths, weaknesses, language_used)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING *;
-            """, (name, email, phone_number, skill_level, strengths, weaknesses))
+            """, (name, email, phone_number, skill_level, strengths, weaknesses, language_used))
             conn.commit()
             return Student(**cursor.fetchone())
         
     def get_student_by_id(self, student_id: int) -> Optional[Student]:
-        # Retrieve a student by ID
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM Students WHERE student_id = %s;", (student_id,))
             row = cursor.fetchone()
             return Student(**row) if row else None
+        
+    def create_session(self, student_id: int, session_summary: Optional[str], transcript: Optional[str]) -> Session:
+        """Create a session for a student."""
+        # create a session with random 5 digit in session id and current datetime
+        session_id = random.randint(10000, 99999)
+        session_date = datetime.now()
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO Sessions (session_id, student_id, session_summary, session_date, transcript)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING *;
+            """, (session_id, student_id, session_summary, session_date, transcript))
+            row = cursor.fetchone()
+            conn.commit()
+            return Session(**row)
+    
+    def list_sessions_for_student(self, student_id: int) -> List[Session]:
+        """Return all sessions for a student."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Sessions WHERE student_id = %s ORDER BY session_date DESC;", (student_id,))
+            rows = cursor.fetchall()
+            return [Session(**row) for row in rows]
