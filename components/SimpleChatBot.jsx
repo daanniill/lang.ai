@@ -39,12 +39,11 @@ const SimpleChatBot = () => {
     // maps all the incoming tracks to their respective source: agent or user, anytime either of them say anything
     useEffect(() => {
         const allMessages = [
-            ...(agentTranscriptions?.map(t => ({...t, type: "agent"}) ?? [])),
-            ...(userTranscriptions?.map(t => ({...t, type: "user"}) ?? [])),
-        ].sort((a, b) => a.firstRecievedTime - b.firstRecievedTime)
-
-        setMessages(allMessages)
-    }, [agentTranscriptions, userTranscriptions])
+          ...(agentTranscriptions?.map((t) => ({ ...t, type: "agent" })) ?? []),
+          ...(userTranscriptions?.map((t) => ({ ...t, type: "user" })) ?? []),
+        ].sort((a, b) => a.firstReceivedTime - b.firstReceivedTime);
+        setMessages(allMessages);
+    }, [agentTranscriptions, userTranscriptions]);
 
     return <div className="chatbot-visualizer">
         <div className="Visualizer-container">

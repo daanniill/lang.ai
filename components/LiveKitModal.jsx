@@ -27,7 +27,7 @@ const LiveKitModal = ({}) =>{
     const handleNameSubmit = (e) => {
         e.preventDefault()
         if (name.trim()) {
-            setIsSubmittingName(true)
+            setIsSubmittingName(false)
             getToken(name)
         }
     }
@@ -46,6 +46,9 @@ const LiveKitModal = ({}) =>{
                         connect={true}
                         video={false}
                         audio={true}
+                        onDisconnected={() => {
+                            setIsSubmittingName(true)
+                        }}
                     >
                         <RoomAudioRenderer/>
                         <SimpleChatBot/>
