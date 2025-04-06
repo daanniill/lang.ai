@@ -45,23 +45,28 @@ const SimpleChatBot = () => {
         setMessages(allMessages);
     }, [agentTranscriptions, userTranscriptions]);
 
-    return <div className="chatbot-visualizer">
-        <div className="Visualizer-container">
-            <BarVisualizer
-            state={state}
-            barCount={7}
-            trackRef={audioTrack}
-            />
-        </div>
-        <div className="control-section">
-            <VoiceAssistantControlBar/>
-            <div className="conversation">
-                {messages.map((msg, index) => (
-                        <Message key={msg.id || index} type={msg.type} text={msg.text} />
-                    ))}
+    return (
+        <div className="flex flex-col space-y-4 p-4 bg-blue-800 rounded-lg shadow-md">
+          <div className="flex justify-center items-center">
+            <div className="w-full max-w-lg">
+              <BarVisualizer
+                state={state}
+                barCount={7}
+                trackRef={audioTrack}
+              />
             </div>
+          </div>
+      
+          <div className="flex flex-col space-y-4">
+            <VoiceAssistantControlBar />
+            <div className="space-y-2 overflow-y-auto max-h-96 bg-white p-4 rounded-lg shadow-sm border border-gray-300 text-black">
+              {messages.map((msg, index) => (
+                <Message key={msg.id || index} type={msg.type} text={msg.text} />
+              ))}
+            </div>
+          </div>
         </div>
-    </div>
-}
+      );
+    }
 
 export default SimpleChatBot

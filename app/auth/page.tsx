@@ -22,6 +22,10 @@ export default function SignUp() {
           });
     
           if (response.ok) {
+            const data = await response.json();
+            const { user } = data;
+            console.log(user.email)
+            sessionStorage.setItem("userEmail", user.email)
             router.push('/dashboard'); // or wherever your protected route is
           } else {
             setError('Authentication failed. Please try again.');
