@@ -1,10 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { OAuth2Client } from 'google-auth-library';
+import { neon } from '@neondatabase/serverless';
+
+// To-do:
+// Spanish, Russian, English options for language choices
 
 interface SessionUser {
     name: string;
     email: string;
-    image?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -47,8 +50,23 @@ export async function POST(request: NextRequest) {
         }
 
         const { email, name, picture, sub} = payload;
-        console.log(email)
-        console.log(name)
+
+        const params: SessionUser = {
+            name: name!,
+            email: email!
+        }
+        const connString = process.env.DB_CONNECTION_STRING!
+
+        if (!connString) {
+            throw new Error('Unable to establish connection to the database')
+        }
+
+        const sql = neon(connString); // ! asserts that this is string so TS will stop screaming at me
+                await sql`
+                INSERT INTO Students (name, email)
+                VALUES (${params.name}, ${params.email})
+                ON CONFLICT (email) DO NOTHING;`;
+
         return NextResponse.json({success: true, user: {email, name, picture, sub}})
     } catch(error) {
         return NextResponse.json(
