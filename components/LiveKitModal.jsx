@@ -8,6 +8,8 @@ const LiveKitModal = ({}) =>{
     const [name, setName] = useState("")
     const [token, setToken] = useState(null)
 
+    const livekitApi = process.env.NEXT_PUBLIC_LIVEKIT_URL
+
     // getting the token from backend server so the agent can access the room
     const getToken = useCallback(async (userName) => {
         try {
@@ -25,6 +27,7 @@ const LiveKitModal = ({}) =>{
     const handleNameSubmit = (e) => {
         e.preventDefault()
         if (name.trim()) {
+            setIsSubmittingName(true)
             getToken(name)
         }
     }
@@ -32,13 +35,13 @@ const LiveKitModal = ({}) =>{
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                {setIsSubmittingName ? (
+                {isSubmittingName ? (
                    <form onSubmit={handleNameSubmit} className="name-form">
-                        <button type="submit">Begin Session</button>
+                        <button onClick={() => {setName("participant")}} type="submit">Begin Session</button>
                    </form> 
                 ) : token ? (
                     <LiveKitRoom
-                        serverUrl={import.meta.env.LIVEKIT_URL}
+                        serverUrl={livekitApi}
                         token={token}
                         connect={true}
                         video={false}
