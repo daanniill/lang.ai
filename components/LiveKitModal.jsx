@@ -4,19 +4,51 @@ import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import SimpleChatBot from "./SimpleChatBot";
 
 const LiveKitModal = ({}) =>{
+    const [isSubmittingName, setIsSubmittingName] = useState(true)
+    const [name, setName] = useState("")
+    const [token, setToken] = useState(null)
+
+    // getting the token from backend server so the agent can access the room
+    const getToken = useCallback(async (userName) => {
+        try {
+            const response = await fetch(`/api/getToken?name=${encodeURIComponent(userName)}`)
+            const token = await response.text()
+            setToken(token);
+            setIsSubmittingName(false)
+        } catch (error) {
+            console.error(error)
+        }
+    }, [])
+
+
+    // need a name to submit to livekit to join room
+    const handleNameSubmit = (e) => {
+        e.preventDefault()
+        if (name.trim()) {
+            getToken(name)
+        }
+    }
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                <LiveKitRoom
-                    serverUrl=""
-                    token=""
-                    connect={true}
-                    video={false}
-                    audio={true}
+                {setIsSubmittingName ? (
+                   <form onSubmit={handleNameSubmit} className="name-form">
+                         <button type="submit">Begin Session</button>
+                   </form> 
+                ) : token ? (
+                    <LiveKitRoom
+                        serverUrl={import.meta.env.LIVEKIT_URL}
+                        token={token}
+                        connect={true}
+                        video={false}
+                        audio={true}
                     >
                         <RoomAudioRenderer/>
                         <SimpleChatBot/>
                     </LiveKitRoom>
+                ) : null}
+                
             </div>
         </div>
     
