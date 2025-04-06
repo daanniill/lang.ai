@@ -44,48 +44,24 @@ const SimpleChatBot = () => {
         ].sort((a, b) => a.firstReceivedTime - b.firstReceivedTime);
         setMessages(allMessages);
     }, [agentTranscriptions, userTranscriptions]);
-    /*<div className="flex w-full h-full">
-           <div className="flex w-full h-full">
-               <BarVisualizer
-               state={state}
-               barCount={7}
-               trackRef={audioTrack}
-               />
-           </div>
-           <div className="flex flex-col w-full h-full place-self-center">
-               <div className="conversation">
-                   {messages.map((msg, index) => (
-                           <Message key={msg.id || index} type={msg.type} text={msg.text} />
-                       ))}
-               </div>
-               <div className="mt-25 flex flex-row rounded-md">
-                   <VoiceAssistantControlBar className="flex flex-col place-items-evenly text-center"/>
-               </div>
-           </div>
-       </div>*/
-    return (
-        <div className="flex flex-col w-full h-full place-self-center space-y-4 p-4 bg-slate-800 rounded-lg shadow-md">
-            <div className="flex justify-center items-center">
-                <div className="w-full max-w-lg">
-                    <BarVisualizer
-                        state={state}
-                        barCount={7}
-                        trackRef={audioTrack}
-                    />
-                </div>
-            </div>
 
-            <div className="flex flex-col w-full h-full space-y-4">
-                <VoiceAssistantControlBar />
-                <div className="space-y-2 overflow-y-auto max-h-96 bg-white p-4 rounded-lg shadow-sm border border-gray-300 text-black">
-                    {messages.map((msg, index) => (
+    return <div className="chatbot-visualizer">
+        <div className="Visualizer-container">
+            <BarVisualizer
+            state={state}
+            barCount={7}
+            trackRef={audioTrack}
+            />
+        </div>
+        <div className="control-section">
+            <VoiceAssistantControlBar/>
+            <div className="conversation">
+                {messages.map((msg, index) => (
                         <Message key={msg.id || index} type={msg.type} text={msg.text} />
                     ))}
-                </div>
             </div>
         </div>
-    );
-
+    </div>
 }
 
 export default SimpleChatBot
