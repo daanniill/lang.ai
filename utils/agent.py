@@ -49,9 +49,6 @@ async def entrypoint(ctx: JobContext):
         )
     )
     session.response.create()
-
-    @ctx.room.on("participant_disconnected")
-    def on_participant_disconnected(participant: rtc.RemoteParticipant):
         
 
 if __name__ == "__main__":

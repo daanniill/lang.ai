@@ -1,4 +1,5 @@
 livekit-agents
+livekit-plugins-turn-detector
 livekit-plugins-openai
 livekit-plugins-silero
 python-dotenv
