@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [skillLevel, setSkillLevel] = useState('');
   const [strengths, setStrengths] = useState('');
   const [weaknesses, setWeaknesses] = useState('');
+  const [userLanguage, setLanguage] = useState('');
 
   const sendMessage = () => {
     if (!message.trim()) return
@@ -66,13 +67,13 @@ export default function Dashboard() {
           email: userEmail,
           skill_level: skillsData.skillLevel,
           strengths: skillsData.strengths,
-          weaknesses: skillsData.weaknesses
+          weaknesses: skillsData.weaknesses,
+          userLanguage: skillsData.userLanguage
         })
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("skillls updated:", data);
         setShowSkillModal(false);
         // close modal and then render the rest of the ui for the chatting
       } else {
@@ -108,9 +109,11 @@ export default function Dashboard() {
         <LiveKitModal/>
         {showSkillModal && (
           <SkillModal
+            userLanguage={userLanguage}
             skillLevel={skillLevel}
             strengths={strengths}
             weaknesses={weaknesses}
+            setLanguage={setLanguage}
             setSkillLevel={setSkillLevel}
             setStrengths={setStrengths}
             setWeaknesses={setWeaknesses}

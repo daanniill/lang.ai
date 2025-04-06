@@ -3,7 +3,9 @@ import { NextResponse, NextRequest } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, skillLevel, strengths, weaknesses } = await req.json();
+    const { email, skillLevel, strengths, weaknesses, userLanguage } = await req.json();
+    console.log(skillLevel)
+    console.log(userLanguage)
     const connString = process.env.DB_CONNECTION_STRING!
 
     if (!connString) {
@@ -14,9 +16,10 @@ export async function POST(req: NextRequest) {
       UPDATE Students
       SET skill_level = ${skillLevel},
           strengths = ${strengths},
-          weaknesses = ${weaknesses}
+          weaknesses = ${weaknesses},
+          language_used = ${userLanguage}
       WHERE email = ${email}
-      RETURNING email, skill_level, strengths, weaknesses;
+      RETURNING email, skill_level, strengths, weaknesses,language_used;
     `;
 
     if (result.length > 0) {
