@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { neon } from '@neondatabase/serverless';
 
 const connString = process.env.DB_CONNECTION_STRING!
@@ -8,9 +7,9 @@ if (!connString) {
 }
 
 const sql = neon(connString); // ! asserts that this is string so TS will stop screaming at me
-export async function query(sqlQuery: string, params: any[] = []) {
+export async function query(sqlQuery: string) {
     try {
-        const response = await sql.query(sqlQuery, params);
+        const response = await sql`${sqlQuery}`
         return response;
     } catch(error) {
         console.error('Database query failed', error)
